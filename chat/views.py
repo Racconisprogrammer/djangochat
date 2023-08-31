@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from chat.models import Message, Room
+from django.http import HttpResponse, JsonResponse
 
 
 def home(request):
@@ -8,7 +9,7 @@ def home(request):
 
 def room(request, room):
     username = request.GET.get('username')
-    room_details = Room.objects.create(name=room)
+    room_details = Room.objects.get(name=room)
     
     return render(request, 'room.html', {
                   'username': username,
@@ -24,7 +25,23 @@ def checkview(request):
     if Room.objects.filter(name=room).exists():
         return redirect(f"/{room}/?username={username}")
     else:
-      new_room = Room.objects.create(name=room)
-      new_room.save()
+        new_room = Room.objects.create(name=room)
+        new_room.save()
+        
+        return redirect(f"/{room}/?username={username}")
       
-      return redirect(f"/{room}/?username={username}")
+      
+def send(request):
+    message = request.POST['message']
+    username = request.POST['username']
+    room_id = request.POST['room_id']
+    
+    new_message = Message.objects.create(value=message, user=username, room=room_id)
+    new_message.save()
+    return HttpResponse('message successfully')
+  
+
+def getMessages(request, room):
+    room_details = Room.objects.get(name=room)
+    messages = Message.objects.filter(room=room_details.id)
+    return JsonResponse({"messages":list(messages.values())})
