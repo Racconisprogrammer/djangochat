@@ -4,3 +4,4 @@ media-files
 .env
 **/__pycache__/
 static-files
+db.sqlite3
