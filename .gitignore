@@ -1,0 +1,6 @@
+.idea
+env
+media-files
+.env
+**/__pycache__/
+static-files
